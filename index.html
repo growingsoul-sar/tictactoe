@@ -3,231 +3,314 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>God-Tier Tic-Tac-Toe</title>
+    <title>GOD-TIER TIC-TAC-TOE</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Orbitron:wght@400;900&display=swap');
-
         :root {
-            --bg: #050505;
-            --card: #111111;
+            --bg: #0a0a0c;
+            --panel: #16161a;
             --accent: #00f2ff;
-            --p1: #ff0055;
-            --p2: #00ff88;
-            --gold: #ffcc00;
+            --x-color: #ff0055;
+            --o-color: #00ff88;
+            --text: #ffffff;
         }
 
-        * { box-sizing: border-box; font-family: 'Orbitron', sans-serif; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .retro-theme {
+            --bg: #1a103c;
+            --panel: #2d1b5e;
+            --accent: #f0abfc;
+            --x-color: #fb7185;
+            --o-color: #38bdf8;
+        }
 
-        /* Full Screen Hack - No scrolling allowed */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body { 
-            background: var(--bg); color: white; margin: 0; padding: 0;
-            display: flex; flex-direction: column; align-items: center; 
-            height: 100dvh; overflow: hidden; justify-content: space-between;
+            background: var(--bg); color: var(--text); margin: 0; padding: 0;
+            font-family: 'Space Grotesk', sans-serif; height: 100dvh; 
+            display: flex; flex-direction: column; overflow: hidden;
+            transition: background 0.5s ease;
         }
 
-        /* Lobby & Game States */
-        #lobby, #game { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        /* Logic Screens */
+        #lobby, #game { 
+            flex: 1; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; padding: 20px;
+        }
         #game { display: none; }
 
-        .neon-text { text-transform: uppercase; letter-spacing: 5px; text-shadow: 0 0 10px var(--accent); color: var(--accent); }
+        .title { 
+            font-family: 'Syncopate', sans-serif; font-size: 2.5rem; 
+            letter-spacing: -2px; margin-bottom: 30px; text-align: center;
+            background: linear-gradient(90deg, var(--x-color), var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
 
-        /* Tournament Scoreboard */
+        /* Menu & Buttons */
+        .card { 
+            background: var(--panel); padding: 30px; border-radius: 24px; 
+            width: 100%; max-width: 400px; border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        input, select { 
+            width: 100%; padding: 15px; margin: 10px 0; background: rgba(0,0,0,0.3);
+            border: 1px solid #444; border-radius: 12px; color: white; font-size: 1rem;
+        }
+
+        .btn {
+            width: 100%; padding: 18px; border-radius: 12px; border: none;
+            font-weight: 700; font-size: 1rem; cursor: pointer;
+            background: var(--accent); color: #000; text-transform: uppercase;
+            transition: 0.2s; margin-top: 10px;
+        }
+        .btn:active { transform: scale(0.96); }
+
+        /* Tournament UI */
         .scoreboard {
             display: flex; justify-content: space-around; width: 100%; max-width: 400px;
-            background: var(--card); padding: 15px; border-radius: 20px; border: 1px solid #333; margin-bottom: 10px;
+            margin-bottom: 20px;
         }
-        .player-info { text-align: center; }
-        .rounds { display: flex; gap: 8px; margin-top: 5px; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; background: #222; border: 1px solid #444; }
-        .dot.won { background: var(--gold); box-shadow: 0 0 10px var(--gold); border: none; }
+        .player-tag { text-align: center; font-weight: 700; }
+        .dots { display: flex; gap: 5px; margin-top: 5px; justify-content: center; }
+        .dot { width: 14px; height: 14px; border-radius: 50%; background: #333; }
+        .dot.won { background: #ffd700; box-shadow: 0 0 15px #ffd700; }
 
-        /* Grid - Perfect Fit */
+        /* Grid - Pro Level */
         .grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-            width: 90vw; max-width: 350px; aspect-ratio: 1/1;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+            width: 100%; max-width: 360px; aspect-ratio: 1;
         }
         .cell {
-            background: var(--card); border: 1px solid #222; border-radius: 15px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: clamp(2rem, 10vw, 4rem); font-weight: 900; cursor: pointer;
+            background: var(--panel); border-radius: 18px; display: flex;
+            align-items: center; justify-content: center; font-size: 4rem;
+            font-weight: 700; cursor: pointer; transition: 0.1s;
+            border: 1px solid rgba(255,255,255,0.05);
         }
-        .cell:hover { background: #1a1a1a; border-color: var(--accent); }
-        .cell.x { color: var(--p1); text-shadow: 0 0 20px var(--p1); }
-        .cell.o { color: var(--p2); text-shadow: 0 0 20px var(--p2); }
+        .cell.x { color: var(--x-color); text-shadow: 0 0 20px var(--x-color); }
+        .cell.o { color: var(--o-color); text-shadow: 0 0 20px var(--o-color); }
 
-        /* UI Elements */
-        .input-group { background: var(--card); padding: 25px; border-radius: 25px; border: 1px solid #333; width: 100%; max-width: 350px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid var(--accent); color: white; border-radius: 10px; text-align: center; }
-        .btn {
-            width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: 900;
-            background: var(--accent); color: black; cursor: pointer; text-transform: uppercase;
-        }
-        .btn:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--accent); }
+        /* Floating Controls */
+        .nav { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; }
+        .mini-btn { background: var(--panel); border: none; color: white; padding: 10px; border-radius: 10px; cursor: pointer; }
 
-        #badge-container { display: none; margin-top: 10px; animation: glow 2s infinite alternate; }
-        @keyframes glow { from { filter: drop-shadow(0 0 5px var(--gold)); } to { filter: drop-shadow(0 0 20px var(--gold)); } }
+        #badge { display: none; color: gold; font-weight: bold; margin-bottom: 10px; animation: bounce 1s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     </style>
 </head>
 <body>
 
     <div id="lobby">
-        <h1 class="neon-text">God Tier</h1>
-        <div class="input-group">
-            <input type="text" id="p1Input" placeholder="YOUR NAME">
-            <select id="mode" style="width:100%; padding:12px; margin-bottom:10px; background:#000; color:white; border-radius:10px; border:1px solid var(--accent);">
-                <option value="ai">VS QUANTUM AI</option>
-                <option value="pvp">VS LOCAL PRO</option>
+        <h1 class="title">NEO MATCH</h1>
+        <div class="card">
+            <input type="text" id="p1Input" placeholder="ENTER PLAYER NAME">
+            <select id="modeInput">
+                <option value="ai">VS QUANTUM AI (ADAPTIVE)</option>
+                <option value="pvp">VS LOCAL HUMAN</option>
             </select>
-            <button class="btn" onclick="startGame()">Initialize Match</button>
+            <button class="btn" onclick="initGame()">LAUNCH MATCH</button>
+            <button class="btn" style="background: #444; color: white;" onclick="toggleTheme()">SWAP THEME</button>
         </div>
     </div>
 
     <div id="game">
-        <div class="scoreboard">
-            <div class="player-info">
-                <span id="p1Display">P1</span>
-                <div class="rounds" id="p1Rounds"><div class="dot"></div><div class="dot"></div></div>
-            </div>
-            <div style="font-size: 0.7rem; color: #555;">BEST OF 3</div>
-            <div class="player-info">
-                <span id="p2Display">CPU</span>
-                <div class="rounds" id="p2Rounds"><div class="dot"></div><div class="dot"></div></div>
-            </div>
+        <div class="nav">
+            <button class="mini-btn" onclick="goHome()">🏠 MENU</button>
+            <div id="turn-indicator" style="font-weight: bold; color: var(--accent);">P1 TURN</div>
+            <button class="mini-btn" onclick="toggleTheme()">🌓</button>
         </div>
 
-        <div id="badge-container">🏆 <span id="winner-name"></span> GOT THE GOD BADGE</div>
+        <div id="badge">🏆 GOD LEVEL ACHIEVED</div>
+
+        <div class="scoreboard">
+            <div class="player-tag">
+                <span id="p1Label">P1</span>
+                <div class="dots" id="p1Dots"><div class="dot"></div><div class="dot"></div></div>
+            </div>
+            <div class="player-tag">
+                <span id="p2Label">CPU</span>
+                <div class="dots" id="p2Dots"><div class="dot"></div><div class="dot"></div></div>
+            </div>
+        </div>
 
         <div class="grid" id="board">
-            <div class="cell" onclick="handleMove(0)"></div>
-            <div class="cell" onclick="handleMove(1)"></div>
-            <div class="cell" onclick="handleMove(2)"></div>
-            <div class="cell" onclick="handleMove(3)"></div>
-            <div class="cell" onclick="handleMove(4)"></div>
-            <div class="cell" onclick="handleMove(5)"></div>
-            <div class="cell" onclick="handleMove(6)"></div>
-            <div class="cell" onclick="handleMove(7)"></div>
-            <div class="cell" onclick="handleMove(8)"></div>
+            <div class="cell" onclick="userMove(0)"></div>
+            <div class="cell" onclick="userMove(1)"></div>
+            <div class="cell" onclick="userMove(2)"></div>
+            <div class="cell" onclick="userMove(3)"></div>
+            <div class="cell" onclick="userMove(4)"></div>
+            <div class="cell" onclick="userMove(5)"></div>
+            <div class="cell" onclick="userMove(6)"></div>
+            <div class="cell" onclick="userMove(7)"></div>
+            <div class="cell" onclick="userMove(8)"></div>
         </div>
 
-        <div style="margin-top: 20px; width: 100%; max-width: 350px;">
-            <button class="btn" id="nextRoundBtn" style="display:none;" onclick="nextRound()">Next Round</button>
-            <button class="btn" id="resetBtn" style="display:none; background: #555;" onclick="location.reload()">Reset Tournament</button>
-        </div>
+        <button class="btn" id="nextBtn" style="display:none; max-width:360px;" onclick="resetRound()">NEXT ROUND</button>
     </div>
 
     <script>
-        let state = {
-            p1Name: "", p2Name: "Quantum AI",
+        // --- PRO AUDIO ENGINE ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(freq, type) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        // --- GAME LOGIC ---
+        let game = {
+            p1Name: localStorage.getItem('ttt-p1') || "",
+            p2Name: "QUANTUM AI",
             p1Wins: 0, p2Wins: 0,
             board: Array(9).fill(""),
             active: true, turn: "X",
             mode: "ai"
         };
 
-        const winCombos = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+        if(game.p1Name) document.getElementById('p1Input').value = game.p1Name;
 
-        function startGame() {
-            state.p1Name = document.getElementById('p1Input').value || "Alpha";
-            state.mode = document.getElementById('mode').value;
-            if(state.mode === 'pvp') state.p2Name = "Sigma Player";
+        const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+        function initGame() {
+            const name = document.getElementById('p1Input').value.toUpperCase() || "PLAYER 1";
+            localStorage.setItem('ttt-p1', name);
+            game.p1Name = name;
+            game.mode = document.getElementById('modeInput').value;
+            game.p2Name = game.mode === 'ai' ? "QUANTUM AI" : "PLAYER 2";
             
-            document.getElementById('p1Display').innerText = state.p1Name;
-            document.getElementById('p2Display').innerText = state.p2Name;
+            document.getElementById('p1Label').innerText = game.p1Name;
+            document.getElementById('p2Label').innerText = game.p2Name;
+            
             document.getElementById('lobby').style.display = 'none';
             document.getElementById('game').style.display = 'flex';
+            resetTournament();
         }
 
-        function handleMove(i) {
-            if(!state.active || state.board[i] !== "") return;
-            executeMove(i, "X");
-            if(state.active && state.mode === 'ai') {
-                state.active = false;
-                setTimeout(aiLogic, 400);
-            }
-        }
-
-        function executeMove(i, char) {
-            state.board[i] = char;
-            const cells = document.querySelectorAll('.cell');
-            cells[i].innerText = char;
-            cells[i].classList.add(char.toLowerCase());
+        function userMove(i) {
+            if (!game.active || game.board[i] !== "") return;
             
-            if(checkWin(state.board, char)) {
-                endRound(char);
-            } else if(!state.board.includes("")) {
-                endRound("draw");
-            } else {
-                state.turn = char === "X" ? "O" : "X";
-                state.active = true;
+            commitMove(i, game.turn);
+            
+            if (game.active && game.mode === 'ai') {
+                game.active = false;
+                setTimeout(aiMove, 500);
             }
         }
 
-        function aiLogic() {
-            let bestScore = -Infinity;
-            let move;
-            for(let i=0; i<9; i++) {
-                if(state.board[i] === "") {
-                    state.board[i] = "O";
-                    let score = minimax(state.board, 0, false);
-                    state.board[i] = "";
-                    if(score > bestScore) { bestScore = score; move = i; }
-                }
+        function commitMove(i, char) {
+            game.board[i] = char;
+            const cell = document.querySelectorAll('.cell')[i];
+            cell.innerText = char;
+            cell.className = `cell ${char.toLowerCase()}`;
+            playSound(char === 'X' ? 440 : 554, 'triangle');
+
+            if (checkWinner(game.board, char)) {
+                processRoundEnd(char);
+            } else if (!game.board.includes("")) {
+                processRoundEnd('draw');
+            } else {
+                game.turn = game.turn === "X" ? "O" : "X";
+                document.getElementById('turn-indicator').innerText = `${game.turn === 'X' ? game.p1Name : game.p2Name} TURN`;
+                game.active = true;
             }
-            executeMove(move, "O");
+        }
+
+        function aiMove() {
+            // Difficulty Nerf: 30% chance to make a random move, 70% chance to be smart
+            const isSmart = Math.random() > 0.3;
+            let move;
+
+            if (isSmart) {
+                let bestScore = -Infinity;
+                for(let i=0; i<9; i++) {
+                    if(game.board[i] === "") {
+                        game.board[i] = "O";
+                        let score = minimax(game.board, 0, false);
+                        game.board[i] = "";
+                        if(score > bestScore) { bestScore = score; move = i; }
+                    }
+                }
+            } else {
+                let available = game.board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+                move = available[Math.floor(Math.random() * available.length)];
+            }
+            commitMove(move, "O");
         }
 
         function minimax(b, depth, isMax) {
-            if(checkWin(b, "O")) return 10;
-            if(checkWin(b, "X")) return -10;
+            if(checkWinner(b, "O")) return 10;
+            if(checkWinner(b, "X")) return -10;
             if(!b.includes("")) return 0;
             
-            let scores = [];
-            for(let i=0; i<9; i++) {
-                if(b[i] === "") {
-                    b[i] = isMax ? "O" : "X";
-                    scores.push(minimax(b, depth+1, !isMax));
-                    b[i] = "";
-                }
-            }
-            return isMax ? Math.max(...scores) : Math.min(...scores);
-        }
-
-        function checkWin(b, p) { return winCombos.some(s => s.every(i => b[i] === p)); }
-
-        function endRound(winner) {
-            state.active = false;
-            if(winner === "X") {
-                state.p1Wins++;
-                updateDots('p1Rounds', state.p1Wins);
-            } else if(winner === "O") {
-                state.p2Wins++;
-                updateDots('p2Rounds', state.p2Wins);
-            }
-
-            if(state.p1Wins === 2 || state.p2Wins === 2) {
-                const finalWinner = state.p1Wins === 2 ? state.p1Name : state.p2Name;
-                document.getElementById('badge-container').style.display = 'block';
-                document.getElementById('winner-name').innerText = finalWinner;
-                document.getElementById('resetBtn').style.display = 'block';
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            if(isMax) {
+                let best = -Infinity;
+                for(let i=0; i<9; i++) if(b[i] === "") { b[i]="O"; best=Math.max(best, minimax(b, depth+1, false)); b[i]=""; }
+                return best;
             } else {
-                document.getElementById('nextRoundBtn').style.display = 'block';
+                let best = Infinity;
+                for(let i=0; i<9; i++) if(b[i] === "") { b[i]="X"; best=Math.min(best, minimax(b, depth+1, true)); b[i]=""; }
+                return best;
             }
         }
 
-        function updateDots(id, wins) {
-            const dots = document.getElementById(id).children;
-            for(let i=0; i<wins; i++) dots[i].classList.add('won');
+        function checkWinner(b, p) { return wins.some(s => s.every(i => b[i] === p)); }
+
+        function processRoundEnd(winner) {
+            game.active = false;
+            if (winner === "X") {
+                game.p1Wins++;
+                updateScore('p1Dots', game.p1Wins);
+            } else if (winner === "O") {
+                game.p2Wins++;
+                updateScore('p2Dots', game.p2Wins);
+            }
+
+            if (game.p1Wins === 2 || game.p2Wins === 2) {
+                const final = game.p1Wins === 2 ? game.p1Name : game.p2Name;
+                document.getElementById('turn-indicator').innerText = `${final} WON TOURNAMENT!`;
+                document.getElementById('badge').style.display = 'block';
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                playSound(880, 'square');
+            } else {
+                document.getElementById('nextBtn').style.display = 'block';
+            }
         }
 
-        function nextRound() {
-            state.board = Array(9).fill("");
-            state.active = true;
-            state.turn = "X";
-            document.querySelectorAll('.cell').forEach(c => { c.innerText = ""; c.className = 'cell'; });
-            document.getElementById('nextRoundBtn').style.display = 'none';
+        function updateScore(id, wins) {
+            const d = document.getElementById(id).children;
+            for(let i=0; i<wins; i++) d[i].classList.add('won');
         }
+
+        function resetRound() {
+            game.board = Array(9).fill("");
+            game.active = true;
+            game.turn = "X";
+            document.querySelectorAll('.cell').forEach(c => { c.innerText = ""; c.className = "cell"; });
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('turn-indicator').innerText = `${game.p1Name} TURN`;
+        }
+
+        function resetTournament() {
+            game.p1Wins = 0; game.p2Wins = 0;
+            document.querySelectorAll('.dot').forEach(d => d.classList.remove('won'));
+            document.getElementById('badge').style.display = 'none';
+            resetRound();
+        }
+
+        function goHome() {
+            document.getElementById('game').style.display = 'none';
+            document.getElementById('lobby').style.display = 'flex';
+        }
+
+        function toggleTheme() { document.body.classList.toggle('retro-theme'); }
     </script>
 </body>
 </html>
