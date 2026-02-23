@@ -3,92 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic-Tac-Toe Pro Voice</title>
-    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
-    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <title>Pro Tic-Tac-Toe</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #1a1a2e; color: white; min-height: 100vh; margin: 0; padding: 20px; }
-        h1 { color: #0f3460; background: #e94560; padding: 10px 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        #msg { font-size: 1.5rem; margin: 20px 0; font-weight: bold; color: #4ecca3; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-        .grid { display: grid; grid-template-columns: repeat(3, 100px); gap: 10px; background: #16213e; padding: 10px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .cell { width: 100px; height: 100px; background: #0f3460; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #e94560; cursor: pointer; transition: 0.3s; }
-        .cell:hover { background: #16213e; transform: scale(1.05); }
-        button { margin-top: 30px; padding: 12px 25px; font-size: 1.1rem; cursor: pointer; border-radius: 8px; border: none; background: #e94560; color: white; font-weight: bold; transition: 0.3s; }
-        button:hover { background: #ff4d6d; transform: translateY(-2px); }
+        :root { --bg: #0f172a; --card: #1e293b; --accent: #38bdf8; --x-color: #f43f5e; --o-color: #10b981; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .status { font-size: 1.5rem; margin-bottom: 20px; font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; }
+        .grid { display: grid; grid-template-columns: repeat(3, 100px); gap: 15px; background: var(--card); padding: 15px; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .cell { width: 100px; height: 100px; background: var(--bg); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+        .cell:hover { transform: scale(1.05); background: #1e293b; }
+        .cell.x { color: var(--x-color); }
+        .cell.o { color: var(--o-color); }
+        .btn { margin-top: 40px; padding: 12px 30px; font-size: 1rem; font-weight: bold; background: var(--accent); color: var(--bg); border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
     </style>
 </head>
 <body>
 
-    <h1>TIC-TAC-TOE PRO</h1>
-    <div id="msg">Player X's Turn</div>
+    <div class="status" id="status">Player X's Turn</div>
 
     <div class="grid">
-        <div id="0" class="cell" py-click="play"></div>
-        <div id="1" class="cell" py-click="play"></div>
-        <div id="2" class="cell" py-click="play"></div>
-        <div id="3" class="cell" py-click="play"></div>
-        <div id="4" class="cell" py-click="play"></div>
-        <div id="5" class="cell" py-click="play"></div>
-        <div id="6" class="cell" py-click="play"></div>
-        <div id="7" class="cell" py-click="play"></div>
-        <div id="8" class="cell" py-click="play"></div>
+        <div class="cell" onclick="makeMove(this, 0)"></div>
+        <div class="cell" onclick="makeMove(this, 1)"></div>
+        <div class="cell" onclick="makeMove(this, 2)"></div>
+        <div class="cell" onclick="makeMove(this, 3)"></div>
+        <div class="cell" onclick="makeMove(this, 4)"></div>
+        <div class="cell" onclick="makeMove(this, 5)"></div>
+        <div class="cell" onclick="makeMove(this, 6)"></div>
+        <div class="cell" onclick="makeMove(this, 7)"></div>
+        <div class="cell" onclick="makeMove(this, 8)"></div>
     </div>
 
-    <button py-click="restart">Restart Game</button>
+    <button class="btn" onclick="reset()">Restart Game</button>
 
-    <py-script>
-from js import window
+    <script>
+        let currentPlayer = 'X';
+        let board = ["", "", "", "", "", "", "", "", ""];
+        let active = true;
 
-board = [""] * 9
-turn = "X"
-active = True
+        const statusDisplay = document.getElementById('status');
+        const winPatterns = [
+            [0,1,2], [3,4,5], [6,7,8], // Rows
+            [0,3,6], [1,4,7], [2,5,8], // Cols
+            [0,4,8], [2,4,6]             // Diagonals
+        ];
 
-def speak(text):
-    # This tells the browser to speak out loud!
-    msg = window.SpeechSynthesisUtterance.new(text)
-    window.speechSynthesis.speak(msg)
+        function announce(msg) {
+            statusDisplay.innerText = msg;
+            const speech = new SpeechSynthesisUtterance(msg);
+            window.speechSynthesis.speak(speech);
+        }
 
-def play(event):
-    global turn, active
-    if not active: return
-    
-    cell_id = int(event.target.id)
-    
-    if board[cell_id] == "":
-        board[cell_id] = turn
-        event.target.innerText = turn
-        
-        if check_win():
-            result = f"Congratulations! Player {turn} wins!"
-            Element("msg").write(result)
-            speak(result)
-            active = False
-        elif "" not in board:
-            msg = "It's a draw!"
-            Element("msg").write(msg)
-            speak(msg)
-            active = False
-        else:
-            turn = "O" if turn == "X" else "X"
-            Element("msg").write(f"Player {turn}'s Turn")
+        function makeMove(element, index) {
+            if (board[index] !== "" || !active) return;
 
-def check_win():
-    wins = [(0,1,2), (3,4,5), (6,7,8), (0,3,6), (1,4,7), (2,5,8), (0,4,8), (2,4,6)]
-    for w in wins:
-        if board[w[0]] == board[w[1]] == board[w[2]] != "":
-            return True
-    return False
+            board[index] = currentPlayer;
+            element.innerText = currentPlayer;
+            element.classList.add(currentPlayer.toLowerCase());
 
-def restart(event):
-    global board, turn, active
-    board = [""] * 9
-    turn = "X"
-    active = True
-    Element("msg").write("New Game! Player X's Turn")
-    speak("Game Restarted")
-    # This clears the visual boxes
-    for i in range(9):
-        Element(str(i)).write("")
-    </py-script>
+            if (checkWin()) {
+                announce(`Player ${currentPlayer} Wins!`);
+                active = false;
+                return;
+            }
+
+            if (!board.includes("")) {
+                announce("It's a Draw!");
+                active = false;
+                return;
+            }
+
+            currentPlayer = currentPlayer === "X" ? "O" : "X";
+            statusDisplay.innerText = `Player ${currentPlayer}'s Turn`;
+        }
+
+        function checkWin() {
+            return winPatterns.some(pattern => {
+                return pattern.every(index => board[index] === currentPlayer);
+            });
+        }
+
+        function reset() {
+            currentPlayer = "X";
+            board = ["", "", "", "", "", "", "", "", ""];
+            active = true;
+            statusDisplay.innerText = "Player X's Turn";
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.innerText = "";
+                cell.classList.remove('x', 'o');
+            });
+            announce("Game Reset");
+        }
+    </script>
 </body>
 </html>
