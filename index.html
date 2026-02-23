@@ -2,21 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My Pro Tic-Tac-Toe</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe Pro Voice</title>
     <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #2c3e50; color: white; }
-        .grid { display: grid; grid-template-columns: repeat(3, 100px); gap: 10px; margin-top: 20px; }
-        .cell { width: 100px; height: 100px; background: #ecf0f1; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #2c3e50; cursor: pointer; font-weight: bold; }
-        .cell:hover { background: #bdc3c7; }
-        #msg { font-size: 24px; margin-top: 20px; font-weight: bold; color: #f1c40f; }
-        button { margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 5px; border: none; background: #27ae60; color: white; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #1a1a2e; color: white; min-height: 100vh; margin: 0; padding: 20px; }
+        h1 { color: #0f3460; background: #e94560; padding: 10px 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        #msg { font-size: 1.5rem; margin: 20px 0; font-weight: bold; color: #4ecca3; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .grid { display: grid; grid-template-columns: repeat(3, 100px); gap: 10px; background: #16213e; padding: 10px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .cell { width: 100px; height: 100px; background: #0f3460; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #e94560; cursor: pointer; transition: 0.3s; }
+        .cell:hover { background: #16213e; transform: scale(1.05); }
+        button { margin-top: 30px; padding: 12px 25px; font-size: 1.1rem; cursor: pointer; border-radius: 8px; border: none; background: #e94560; color: white; font-weight: bold; transition: 0.3s; }
+        button:hover { background: #ff4d6d; transform: translateY(-2px); }
     </style>
 </head>
 <body>
 
-    <h1>Tic-Tac-Toe Python Web</h1>
+    <h1>TIC-TAC-TOE PRO</h1>
     <div id="msg">Player X's Turn</div>
 
     <div class="grid">
@@ -34,25 +37,36 @@
     <button py-click="restart">Restart Game</button>
 
     <py-script>
-# --- YOUR PYTHON LOGIC STARTS HERE ---
+from js import window
+
 board = [""] * 9
 turn = "X"
 active = True
+
+def speak(text):
+    # This tells the browser to speak out loud!
+    msg = window.SpeechSynthesisUtterance.new(text)
+    window.speechSynthesis.speak(msg)
 
 def play(event):
     global turn, active
     if not active: return
     
     cell_id = int(event.target.id)
+    
     if board[cell_id] == "":
         board[cell_id] = turn
         event.target.innerText = turn
         
         if check_win():
-            Element("msg").write(f"🎉 PLAYER {turn} WINS! 🎉")
+            result = f"Congratulations! Player {turn} wins!"
+            Element("msg").write(result)
+            speak(result)
             active = False
         elif "" not in board:
-            Element("msg").write("🤝 IT'S A DRAW! 🤝")
+            msg = "It's a draw!"
+            Element("msg").write(msg)
+            speak(msg)
             active = False
         else:
             turn = "O" if turn == "X" else "X"
@@ -70,10 +84,11 @@ def restart(event):
     board = [""] * 9
     turn = "X"
     active = True
-    Element("msg").write("Player X's Turn")
+    Element("msg").write("New Game! Player X's Turn")
+    speak("Game Restarted")
+    # This clears the visual boxes
     for i in range(9):
         Element(str(i)).write("")
-# --- END OF PYTHON LOGIC ---
     </py-script>
 </body>
 </html>
