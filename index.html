@@ -3,29 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GOD-TIER TIC-TAC-TOE</title>
+    <title>GOD-TIER TIC-TAC-TOE V3</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0a0c;
-            --panel: #16161a;
-            --accent: #00f2ff;
-            --x-color: #ff0055;
-            --o-color: #00ff88;
-            --text: #ffffff;
+            --bg: #0a0a0c; --panel: #16161a; --accent: #00f2ff;
+            --x-color: #ff0055; --o-color: #00ff88; --text: #ffffff;
         }
-
         .retro-theme {
-            --bg: #1a103c;
-            --panel: #2d1b5e;
-            --accent: #f0abfc;
-            --x-color: #fb7185;
-            --o-color: #38bdf8;
+            --bg: #1a103c; --panel: #2d1b5e; --accent: #f0abfc;
+            --x-color: #fb7185; --o-color: #38bdf8;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
         body { 
             background: var(--bg); color: var(--text); margin: 0; padding: 0;
             font-family: 'Space Grotesk', sans-serif; height: 100dvh; 
@@ -33,70 +24,38 @@
             transition: background 0.5s ease;
         }
 
-        /* Logic Screens */
-        #lobby, #game { 
-            flex: 1; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; padding: 20px;
-        }
+        #lobby, #game { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         #game { display: none; }
 
         .title { 
-            font-family: 'Syncopate', sans-serif; font-size: 2.5rem; 
-            letter-spacing: -2px; margin-bottom: 30px; text-align: center;
-            background: linear-gradient(90deg, var(--x-color), var(--accent));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-family: 'Syncopate', sans-serif; font-size: 2.5rem; letter-spacing: -2px; margin-bottom: 30px; text-align: center;
+            background: linear-gradient(90deg, var(--x-color), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        /* Menu & Buttons */
-        .card { 
-            background: var(--panel); padding: 30px; border-radius: 24px; 
-            width: 100%; max-width: 400px; border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
+        .card { background: var(--panel); padding: 30px; border-radius: 24px; width: 100%; max-width: 400px; border: 1px solid rgba(255,255,255,0.1); }
+        input, select { width: 100%; padding: 15px; margin: 10px 0; background: rgba(0,0,0,0.3); border: 1px solid #444; border-radius: 12px; color: white; }
 
-        input, select { 
-            width: 100%; padding: 15px; margin: 10px 0; background: rgba(0,0,0,0.3);
-            border: 1px solid #444; border-radius: 12px; color: white; font-size: 1rem;
-        }
+        .btn { width: 100%; padding: 18px; border-radius: 12px; border: none; font-weight: 700; background: var(--accent); color: #000; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
 
-        .btn {
-            width: 100%; padding: 18px; border-radius: 12px; border: none;
-            font-weight: 700; font-size: 1rem; cursor: pointer;
-            background: var(--accent); color: #000; text-transform: uppercase;
-            transition: 0.2s; margin-top: 10px;
-        }
-        .btn:active { transform: scale(0.96); }
+        /* --- PRO ANIMATIONS --- */
+        @keyframes pop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes winner-glow { 0% { box-shadow: 0 0 10px gold; transform: scale(1); } 50% { box-shadow: 0 0 30px gold; transform: scale(1.05); } 100% { box-shadow: 0 0 10px gold; transform: scale(1); } }
+        @keyframes shake { 0% { transform: translate(1px, 1px); } 10% { transform: translate(-1px, -2px); } 100% { transform: translate(0, 0); } }
 
-        /* Tournament UI */
-        .scoreboard {
-            display: flex; justify-content: space-around; width: 100%; max-width: 400px;
-            margin-bottom: 20px;
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 360px; aspect-ratio: 1; }
+        .cell { 
+            background: var(--panel); border-radius: 18px; display: flex; align-items: center; justify-content: center; 
+            font-size: 4rem; font-weight: 700; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); 
         }
-        .player-tag { text-align: center; font-weight: 700; }
-        .dots { display: flex; gap: 5px; margin-top: 5px; justify-content: center; }
+        .cell.x { color: var(--x-color); text-shadow: 0 0 20px var(--x-color); animation: pop 0.2s ease-out; }
+        .cell.o { color: var(--o-color); text-shadow: 0 0 20px var(--o-color); animation: pop 0.2s ease-out; }
+        .winner-cell { animation: winner-glow 0.6s infinite !important; border: 2px solid gold !important; z-index: 10; }
+        .shake-effect { animation: shake 0.3s; }
+
+        .nav { position: absolute; top: 20px; width: 90%; display: flex; justify-content: space-between; }
+        .scoreboard { display: flex; justify-content: space-around; width: 100%; max-width: 400px; margin-bottom: 20px; }
         .dot { width: 14px; height: 14px; border-radius: 50%; background: #333; }
         .dot.won { background: #ffd700; box-shadow: 0 0 15px #ffd700; }
-
-        /* Grid - Pro Level */
-        .grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-            width: 100%; max-width: 360px; aspect-ratio: 1;
-        }
-        .cell {
-            background: var(--panel); border-radius: 18px; display: flex;
-            align-items: center; justify-content: center; font-size: 4rem;
-            font-weight: 700; cursor: pointer; transition: 0.1s;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-        .cell.x { color: var(--x-color); text-shadow: 0 0 20px var(--x-color); }
-        .cell.o { color: var(--o-color); text-shadow: 0 0 20px var(--o-color); }
-
-        /* Floating Controls */
-        .nav { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; }
-        .mini-btn { background: var(--panel); border: none; color: white; padding: 10px; border-radius: 10px; cursor: pointer; }
-
-        #badge { display: none; color: gold; font-weight: bold; margin-bottom: 10px; animation: bounce 1s infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     </style>
 </head>
 <body>
@@ -110,28 +69,19 @@
                 <option value="pvp">VS LOCAL HUMAN</option>
             </select>
             <button class="btn" onclick="initGame()">LAUNCH MATCH</button>
-            <button class="btn" style="background: #444; color: white;" onclick="toggleTheme()">SWAP THEME</button>
         </div>
     </div>
 
     <div id="game">
         <div class="nav">
-            <button class="mini-btn" onclick="goHome()">🏠 MENU</button>
+            <button onclick="goHome()" style="background:none; border:none; color:white; cursor:pointer;">🏠 MENU</button>
             <div id="turn-indicator" style="font-weight: bold; color: var(--accent);">P1 TURN</div>
-            <button class="mini-btn" onclick="toggleTheme()">🌓</button>
+            <button onclick="toggleTheme()" style="background:none; border:none; color:white; cursor:pointer;">🌓 THEME</button>
         </div>
 
-        <div id="badge">🏆 GOD LEVEL ACHIEVED</div>
-
         <div class="scoreboard">
-            <div class="player-tag">
-                <span id="p1Label">P1</span>
-                <div class="dots" id="p1Dots"><div class="dot"></div><div class="dot"></div></div>
-            </div>
-            <div class="player-tag">
-                <span id="p2Label">CPU</span>
-                <div class="dots" id="p2Dots"><div class="dot"></div><div class="dot"></div></div>
-            </div>
+            <div><span id="p1Label">P1</span><div class="dots" id="p1Dots"><div class="dot"></div><div class="dot"></div></div></div>
+            <div><span id="p2Label">CPU</span><div class="dots" id="p2Dots"><div class="dot"></div><div class="dot"></div></div></div>
         </div>
 
         <div class="grid" id="board">
@@ -145,50 +95,28 @@
             <div class="cell" onclick="userMove(7)"></div>
             <div class="cell" onclick="userMove(8)"></div>
         </div>
-
         <button class="btn" id="nextBtn" style="display:none; max-width:360px;" onclick="resetRound()">NEXT ROUND</button>
     </div>
 
     <script>
-        // --- PRO AUDIO ENGINE ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSound(freq, type) {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.1);
+        function playSound(f, t) {
+            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+            o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime);
+            g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
+            o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.1);
         }
 
-        // --- GAME LOGIC ---
-        let game = {
-            p1Name: localStorage.getItem('ttt-p1') || "",
-            p2Name: "QUANTUM AI",
-            p1Wins: 0, p2Wins: 0,
-            board: Array(9).fill(""),
-            active: true, turn: "X",
-            mode: "ai"
-        };
-
+        let game = { p1Name: localStorage.getItem('ttt-p1') || "", board: Array(9).fill(""), active: true, turn: "X", mode: "ai", p1Wins: 0, p2Wins: 0 };
         if(game.p1Name) document.getElementById('p1Input').value = game.p1Name;
-
         const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 
         function initGame() {
-            const name = document.getElementById('p1Input').value.toUpperCase() || "PLAYER 1";
-            localStorage.setItem('ttt-p1', name);
-            game.p1Name = name;
+            game.p1Name = document.getElementById('p1Input').value.toUpperCase() || "PLAYER 1";
+            localStorage.setItem('ttt-p1', game.p1Name);
             game.mode = document.getElementById('modeInput').value;
-            game.p2Name = game.mode === 'ai' ? "QUANTUM AI" : "PLAYER 2";
-            
             document.getElementById('p1Label').innerText = game.p1Name;
-            document.getElementById('p2Label').innerText = game.p2Name;
-            
+            document.getElementById('p2Label').innerText = game.mode === 'ai' ? "QUANTUM AI" : "PLAYER 2";
             document.getElementById('lobby').style.display = 'none';
             document.getElementById('game').style.display = 'flex';
             resetTournament();
@@ -196,120 +124,94 @@
 
         function userMove(i) {
             if (!game.active || game.board[i] !== "") return;
-            
             commitMove(i, game.turn);
-            
             if (game.active && game.mode === 'ai') {
                 game.active = false;
-                setTimeout(aiMove, 500);
+                setTimeout(aiMove, 600);
             }
         }
 
         function commitMove(i, char) {
             game.board[i] = char;
-            const cell = document.querySelectorAll('.cell')[i];
-            cell.innerText = char;
-            cell.className = `cell ${char.toLowerCase()}`;
+            const cells = document.querySelectorAll('.cell');
+            cells[i].innerText = char;
+            cells[i].className = `cell ${char.toLowerCase()}`;
             playSound(char === 'X' ? 440 : 554, 'triangle');
 
-            if (checkWinner(game.board, char)) {
+            let winPattern = getWinPattern(game.board, char);
+            if (winPattern) {
+                winPattern.forEach(index => cells[index].classList.add('winner-cell'));
                 processRoundEnd(char);
             } else if (!game.board.includes("")) {
                 processRoundEnd('draw');
             } else {
                 game.turn = game.turn === "X" ? "O" : "X";
-                document.getElementById('turn-indicator').innerText = `${game.turn === 'X' ? game.p1Name : game.p2Name} TURN`;
+                document.getElementById('turn-indicator').innerText = `${game.turn === 'X' ? game.p1Name : (game.mode === 'ai' ? "AI" : "P2")} TURN`;
                 game.active = true;
             }
         }
 
         function aiMove() {
-            // Difficulty Nerf: 30% chance to make a random move, 70% chance to be smart
-            const isSmart = Math.random() > 0.3;
+            document.getElementById('board').classList.add('shake-effect');
+            setTimeout(() => document.getElementById('board').classList.remove('shake-effect'), 300);
+            
             let move;
-
-            if (isSmart) {
-                let bestScore = -Infinity;
-                for(let i=0; i<9; i++) {
-                    if(game.board[i] === "") {
-                        game.board[i] = "O";
-                        let score = minimax(game.board, 0, false);
-                        game.board[i] = "";
-                        if(score > bestScore) { bestScore = score; move = i; }
-                    }
+            if (Math.random() > 0.3) {
+                let best = -Infinity;
+                for(let i=0; i<9; i++) if(game.board[i]==="") {
+                    game.board[i]="O"; let s = minimax(game.board, 0, false); game.board[i]="";
+                    if(s > best) { best = s; move = i; }
                 }
             } else {
-                let available = game.board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
-                move = available[Math.floor(Math.random() * available.length)];
+                let avail = game.board.map((v, i) => v===""?i:null).filter(v=>v!==null);
+                move = avail[Math.floor(Math.random()*avail.length)];
             }
             commitMove(move, "O");
         }
 
-        function minimax(b, depth, isMax) {
-            if(checkWinner(b, "O")) return 10;
-            if(checkWinner(b, "X")) return -10;
-            if(!b.includes("")) return 0;
-            
-            if(isMax) {
-                let best = -Infinity;
-                for(let i=0; i<9; i++) if(b[i] === "") { b[i]="O"; best=Math.max(best, minimax(b, depth+1, false)); b[i]=""; }
-                return best;
-            } else {
-                let best = Infinity;
-                for(let i=0; i<9; i++) if(b[i] === "") { b[i]="X"; best=Math.min(best, minimax(b, depth+1, true)); b[i]=""; }
-                return best;
+        function minimax(b, d, m) {
+            if(getWinPattern(b, "O")) return 10; if(getWinPattern(b, "X")) return -10; if(!b.includes("")) return 0;
+            let scores = [];
+            for(let i=0; i<9; i++) if(b[i]==="") {
+                b[i] = m ? "O" : "X"; scores.push(minimax(b, d+1, !m)); b[i] = "";
             }
+            return m ? Math.max(...scores) : Math.min(...scores);
         }
 
-        function checkWinner(b, p) { return wins.some(s => s.every(i => b[i] === p)); }
+        function getWinPattern(b, p) { return wins.find(s => s.every(i => b[i] === p)); }
 
-        function processRoundEnd(winner) {
+        function processRoundEnd(w) {
             game.active = false;
-            if (winner === "X") {
-                game.p1Wins++;
-                updateScore('p1Dots', game.p1Wins);
-            } else if (winner === "O") {
-                game.p2Wins++;
-                updateScore('p2Dots', game.p2Wins);
-            }
+            if(w === "X") { game.p1Wins++; updateDots('p1Dots', game.p1Wins); }
+            else if(w === "O") { game.p2Wins++; updateDots('p2Dots', game.p2Wins); }
 
-            if (game.p1Wins === 2 || game.p2Wins === 2) {
-                const final = game.p1Wins === 2 ? game.p1Name : game.p2Name;
-                document.getElementById('turn-indicator').innerText = `${final} WON TOURNAMENT!`;
-                document.getElementById('badge').style.display = 'block';
+            if(game.p1Wins === 2 || game.p2Wins === 2) {
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-                playSound(880, 'square');
+                document.getElementById('turn-indicator').innerText = "MATCH COMPLETE!";
             } else {
                 document.getElementById('nextBtn').style.display = 'block';
             }
         }
 
-        function updateScore(id, wins) {
+        function updateDots(id, wins) {
             const d = document.getElementById(id).children;
             for(let i=0; i<wins; i++) d[i].classList.add('won');
         }
 
         function resetRound() {
-            game.board = Array(9).fill("");
-            game.active = true;
-            game.turn = "X";
+            game.board = Array(9).fill(""); game.active = true; game.turn = "X";
             document.querySelectorAll('.cell').forEach(c => { c.innerText = ""; c.className = "cell"; });
-            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = "none";
             document.getElementById('turn-indicator').innerText = `${game.p1Name} TURN`;
         }
 
         function resetTournament() {
             game.p1Wins = 0; game.p2Wins = 0;
             document.querySelectorAll('.dot').forEach(d => d.classList.remove('won'));
-            document.getElementById('badge').style.display = 'none';
             resetRound();
         }
 
-        function goHome() {
-            document.getElementById('game').style.display = 'none';
-            document.getElementById('lobby').style.display = 'flex';
-        }
-
+        function goHome() { document.getElementById('game').style.display = 'none'; document.getElementById('lobby').style.display = 'flex'; }
         function toggleTheme() { document.body.classList.toggle('retro-theme'); }
     </script>
 </body>
