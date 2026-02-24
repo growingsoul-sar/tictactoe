@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEO MATCH ULTRA</title>
+    <title>NEO MATCH - SARK ULTRA</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#00f2ff">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -12,56 +12,66 @@
         :root {
             --bg: #0a0a0c; --panel: #16161a; --accent: #00f2ff;
             --x-color: #ff0055; --o-color: #00ff88; --text: #ffffff;
-            --glass: rgba(255, 255, 255, 0.05);
+            --glass: rgba(255, 255, 255, 0.08);
         }
         .theme-matrix { --bg: #000; --panel: #0a110a; --accent: #00ff41; --x-color: #008f11; --o-color: #d1ffd7; }
         .theme-vapor { --bg: #2d1b5e; --panel: #4c1d95; --accent: #f0abfc; --x-color: #fb7185; --o-color: #38bdf8; }
         .theme-gold { --bg: #111; --panel: #1f1f1f; --accent: #fbbf24; --x-color: #fff; --o-color: #f59e0b; }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { 
             background: var(--bg); color: var(--text); margin: 0; 
             font-family: 'Space Grotesk', sans-serif; height: 100dvh; 
-            display: flex; flex-direction: column; overflow: hidden;
-            transition: 0.4s;
+            display: flex; flex-direction: column; overflow: hidden; transition: 0.4s;
         }
 
         .screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         #game { display: none; }
 
         .title { 
-            font-family: 'Syncopate', sans-serif; font-size: 2.2rem; letter-spacing: -1px; margin-bottom: 20px; text-align: center;
+            font-family: 'Syncopate', sans-serif; font-size: 2.2rem; margin-bottom: 20px; text-align: center;
             background: linear-gradient(90deg, var(--x-color), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
         }
 
-        .card { background: var(--panel); padding: 25px; border-radius: 24px; width: 100%; max-width: 380px; border: 1px solid var(--glass); }
-        input, select { width: 100%; padding: 14px; margin: 8px 0; background: rgba(0,0,0,0.3); border: 1px solid #333; border-radius: 12px; color: white; }
+        .card { background: var(--panel); padding: 25px; border-radius: 28px; width: 100%; max-width: 380px; border: 1px solid var(--glass); }
+        input, select { width: 100%; padding: 14px; margin: 8px 0; background: rgba(0,0,0,0.4); border: 1px solid #333; border-radius: 12px; color: white; font-family: inherit; }
 
         .btn { 
-            width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; 
-            background: var(--accent); color: #000; cursor: pointer; text-transform: uppercase; margin-top: 8px;
+            width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 700; 
+            background: var(--accent); color: #000; cursor: pointer; text-transform: uppercase; transition: 0.2s;
         }
-        .btn-share { background: #5865F2; color: white; margin-top: 15px; }
-
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 340px; aspect-ratio: 1; margin: 15px 0; }
-        .cell { 
-            background: var(--panel); border-radius: 15px; display: flex; align-items: center; justify-content: center; 
-            font-size: 3rem; font-weight: 700; cursor: pointer; border: 1px solid var(--glass); transition: 0.2s;
-        }
-        .cell.x { color: var(--x-color); text-shadow: 0 0 15px var(--x-color); animation: pop 0.3s forwards; }
-        .cell.o { color: var(--o-color); text-shadow: 0 0 15px var(--o-color); animation: pop 0.3s forwards; }
+        .btn:active { transform: scale(0.95); }
         
-        @keyframes pop { 0% { transform: scale(0.5); } 100% { transform: scale(1); } }
-        .winner-cell { background: var(--accent) !important; color: #000 !important; }
+        /* COOL ICON BUTTONS */
+        .icon-btn { 
+            background: var(--glass); border: 1px solid var(--accent); color: var(--accent);
+            padding: 12px 18px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; cursor: pointer;
+            backdrop-filter: blur(5px);
+        }
 
-        .scoreboard { display: flex; justify-content: space-between; width: 100%; max-width: 340px; padding: 12px; background: var(--glass); border-radius: 15px; margin-bottom: 10px; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; background: #333; margin: 2px; display: inline-block; }
-        .dot.won { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 340px; aspect-ratio: 1; margin: 15px 0; }
+        .cell { 
+            background: var(--panel); border-radius: 20px; display: flex; align-items: center; justify-content: center; 
+            font-size: 3.2rem; font-weight: 700; cursor: pointer; border: 1px solid var(--glass); transition: 0.2s;
+        }
+        .cell:active { background: var(--glass); }
+        .cell.x { color: var(--x-color); text-shadow: 0 0 15px var(--x-color); animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .cell.o { color: var(--o-color); text-shadow: 0 0 15px var(--o-color); animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        @keyframes pop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .winner-cell { background: var(--accent) !important; color: #000 !important; box-shadow: 0 0 20px var(--accent); }
+
+        .scoreboard { display: flex; justify-content: space-between; width: 100%; max-width: 340px; padding: 18px; background: var(--glass); border-radius: 20px; margin-bottom: 10px; }
+        .dot { width: 14px; height: 14px; border-radius: 50%; background: #333; margin: 2px; display: inline-block; transition: 0.4s; }
+        .dot.won { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
 
         #congrats-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none;
-            flex-direction: column; align-items: center; justify-content: center; z-index: 100; text-align: center;
+            flex-direction: column; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(10px);
         }
+
+        .footer { position: absolute; bottom: 15px; width: 100%; text-align: center; font-size: 0.75rem; opacity: 0.6; letter-spacing: 3px; font-weight: bold; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -70,26 +80,32 @@
         <h1 class="title">NEO MATCH</h1>
         <div class="card">
             <input type="text" id="p1Input" placeholder="YOUR NAME">
+            <select id="diffInput">
+                <option value="0.6">LEVEL: EASY (NOOB)</option>
+                <option value="0.2">LEVEL: PRO (CHALLENGE)</option>
+                <option value="0">LEVEL: GOD (UNBEATABLE)</option>
+            </select>
             <select id="modeInput">
                 <option value="ai">VS QUANTUM AI</option>
-                <option value="pvp">LOCAL BATTLE (PVP)</option>
+                <option value="pvp">LOCAL HUMAN BATTLE</option>
             </select>
             <select id="themeInput" onchange="applyTheme(this.value)">
-                <option value="default">CYBER NEON</option>
-                <option value="matrix">THE MATRIX</option>
-                <option value="vapor">VAPORWAVE</option>
-                <option value="gold">LUX GOLD</option>
+                <option value="default">THEME: CYBER NEON</option>
+                <option value="matrix">THEME: MATRIX CODE</option>
+                <option value="vapor">THEME: VAPORWAVE</option>
+                <option value="gold">THEME: LUX GOLD</option>
             </select>
-            <button class="btn" onclick="initGame()">LAUNCH MATCH</button>
-            <p style="text-align:center; opacity:0.6; margin-top:10px;">WORLD STREAK: <span id="highScore">0</span></p>
+            <button class="btn" onclick="initGame()">START BATTLE</button>
+            <button onclick="forceUpdate()" style="margin-top:25px; background:none; border:none; color:var(--accent); font-size:0.7rem; cursor:pointer; text-decoration: underline;">SYNC APP UPDATES</button>
         </div>
+        <div class="footer">DEVELOPED BY ~Sark</div>
     </div>
 
     <div id="game" class="screen">
-        <div style="width:100%; max-width:340px; display:flex; justify-content:space-between; margin-bottom:10px;">
-            <button onclick="goHome()" style="color:white; background:none; border:none;">[MENU]</button>
-            <div id="status" style="color:var(--accent); font-weight:bold;">X TURN</div>
-            <button onclick="resetRound()" style="color:white; background:none; border:none;">[RESTART]</button>
+        <div style="width:100%; max-width:340px; display:flex; justify-content:space-between; margin-bottom:15px; align-items: center;">
+            <button class="icon-btn" onclick="goHome()">🏠 MENU</button>
+            <div id="status" style="color:var(--accent); font-weight:bold; font-size: 0.9rem;">X TURN</div>
+            <button class="icon-btn" onclick="resetRound()">🔄 RESET</button>
         </div>
 
         <div class="scoreboard">
@@ -99,57 +115,79 @@
 
         <div class="grid" id="board"></div>
         <button id="nextBtn" class="btn" style="display:none; max-width:340px;" onclick="resetRound()">NEXT ROUND</button>
+        <div class="footer">DEVELOPED BY ~Sark</div>
     </div>
 
     <div id="congrats-overlay">
-        <h2 id="winner-msg" class="title">VICTORY!</h2>
-        <p id="winner-sub" style="margin-bottom:20px;"></p>
+        <h2 id="winner-msg" class="title" style="font-size: 3rem;">MATCH WON</h2>
+        <p id="winner-sub" style="margin-bottom:40px; letter-spacing: 1px;"></p>
         <div style="width:80%; max-width:300px;">
             <button class="btn" onclick="resetTournament()">REMATCH</button>
-            <button class="btn btn-share" onclick="shareScore()">CHALLENGE FRIENDS</button>
-            <button class="btn btn-outline" onclick="goHome()" style="background:none; color:white; border:1px solid white; margin-top:10px;">EXIT</button>
+            <button class="btn" onclick="goHome()" style="background:none; color:white; border:1px solid white; margin-top:15px;">QUIT GAME</button>
         </div>
+        <div class="footer">DEVELOPED BY ~Sark</div>
     </div>
 
     <script>
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playNote(freq, type="sine", dur=0.1) {
+        
+        // AUDIO ENGINE
+        function playNote(freq, type="sine", dur=0.1, vol=0.08) {
             const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
             o.type = type; o.frequency.value = freq;
-            g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+            g.gain.setValueAtTime(vol, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + dur);
             o.connect(g); g.connect(audioCtx.destination);
             o.start(); o.stop(audioCtx.currentTime + dur);
         }
 
-        function playWinMusic() { [440, 554, 659, 880].forEach((f, i) => setTimeout(() => playNote(f, "triangle", 0.5), i * 150)); }
-        function playLoseMusic() { [300, 250, 200].forEach((f, i) => setTimeout(() => playNote(f, "sawtooth", 0.6), i * 200)); }
+        let bgLoop;
+        function startMusic() {
+            stopMusic();
+            bgLoop = setInterval(() => {
+                playNote(120, "triangle", 0.8, 0.015); // Deep ambient pulse
+            }, 1200);
+        }
+        function stopMusic() { clearInterval(bgLoop); }
+
+        function sfxWin() { [523, 659, 783, 1046].forEach((f, i) => setTimeout(() => playNote(f, "sine", 0.5, 0.15), i * 120)); }
+        function sfxLose() { [220, 180, 140].forEach((f, i) => setTimeout(() => playNote(f, "sawtooth", 0.6, 0.15), i * 180)); }
 
         let state = {
             board: Array(9).fill(""), turn: "X", active: true, mode: "ai",
-            p1Wins: 0, p2Wins: 0, p1Name: "PLAYER 1"
+            p1Wins: 0, p2Wins: 0, p1Name: "SARK", difficulty: 0.2
         };
 
         function applyTheme(t) { document.body.className = t === 'default' ? '' : 'theme-' + t; }
 
+        // MOBILE REFRESH FIX
+        function forceUpdate() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(regs => {
+                    for(let reg of regs) reg.unregister();
+                    window.location.reload(true);
+                });
+            } else { window.location.reload(true); }
+        }
+
         function initGame() {
-            state.p1Name = document.getElementById('p1Input').value.toUpperCase() || "PLAYER";
+            state.p1Name = document.getElementById('p1Input').value.toUpperCase() || "SARK";
             state.mode = document.getElementById('modeInput').value;
+            state.difficulty = parseFloat(document.getElementById('diffInput').value);
             document.getElementById('p1Label').innerText = state.p1Name;
-            document.getElementById('p2Label').innerText = state.mode === 'ai' ? "QUANTUM AI" : "PLAYER 2";
+            document.getElementById('p2Label').innerText = state.mode === 'ai' ? "AI" : "PLAYER 2";
             document.getElementById('lobby').style.display = 'none';
             document.getElementById('game').style.display = 'flex';
-            
-            // Generate dots
-            document.getElementById('p1Dots').innerHTML = '<div class="dot"></div><div class="dot"></div>';
-            document.getElementById('p2Dots').innerHTML = '<div class="dot"></div><div class="dot"></div>';
-            
+            startMusic();
             resetTournament();
         }
 
         function handleMove(i) {
             if (!state.active || state.board[i] !== "") return;
             
-            makeMove(i, state.turn);
+            // Fix: Strict Turn Toggling for PvP
+            const currentPlayer = state.turn;
+            makeMove(i, currentPlayer);
 
             if (state.active && state.mode === "ai" && state.turn === "O") {
                 state.active = false;
@@ -162,7 +200,7 @@
             const cells = document.querySelectorAll('.cell');
             cells[i].innerText = char;
             cells[i].classList.add(char.toLowerCase());
-            playNote(char === "X" ? 400 : 300);
+            playNote(char === "X" ? 440 : 330, "sine", 0.12);
 
             const win = checkWin(state.board, char);
             if (win) {
@@ -172,22 +210,30 @@
                 endRound("draw");
             } else {
                 state.turn = state.turn === "X" ? "O" : "X";
-                document.getElementById('status').innerText = (state.turn === "X" ? state.p1Name : (state.mode === 'ai' ? "AI" : "P2")) + " TURN";
+                const displayTurn = state.turn === "X" ? state.p1Name : (state.mode === 'ai' ? "AI" : "P2");
+                document.getElementById('status').innerText = displayTurn + " TURN";
                 state.active = true;
             }
         }
 
         function aiLogic() {
-            let bestScore = -Infinity, move;
-            for (let i = 0; i < 9; i++) {
-                if (state.board[i] === "") {
-                    state.board[i] = "O";
-                    let score = minimax(state.board, 0, false);
-                    state.board[i] = "";
-                    if (score > bestScore) { bestScore = score; move = i; }
+            let move;
+            // Luck Factor for Easy/Pro modes
+            if (Math.random() < state.difficulty) {
+                const avail = state.board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+                move = avail[Math.floor(Math.random() * avail.length)];
+            } else {
+                let bestScore = -Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (state.board[i] === "") {
+                        state.board[i] = "O";
+                        let score = minimax(state.board, 0, false);
+                        state.board[i] = "";
+                        if (score > bestScore) { bestScore = score; move = i; }
+                    }
                 }
             }
-            makeMove(move, "O");
+            if (move !== undefined) makeMove(move, "O");
         }
 
         function minimax(board, depth, isMax) {
@@ -220,18 +266,24 @@
             if (winner === "O") { state.p2Wins++; updateDots('p2Dots', state.p2Wins); }
 
             if (state.p1Wins === 2 || state.p2Wins === 2) {
-                const finalWinner = state.p1Wins === 2 ? state.p1Name : (state.mode === 'ai' ? "AI" : "PLAYER 2");
-                if (state.p1Wins === 2) { playWinMusic(); confetti(); } else { playLoseMusic(); }
-                document.getElementById('winner-sub').innerText = finalWinner + " IS THE SUPREME CHAMPION";
-                document.getElementById('congrats-overlay').style.display = 'flex';
+                stopMusic();
+                const finalist = state.p1Wins === 2 ? state.p1Name : (state.mode === 'ai' ? "AI" : "PLAYER 2");
+                if (state.p1Wins === 2) { sfxWin(); confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } }); } 
+                else { sfxLose(); }
+                document.getElementById('winner-sub').innerText = finalist + " SECURED TOTAL DOMINATION";
+                setTimeout(() => document.getElementById('congrats-overlay').style.display = 'flex', 500);
             } else {
                 document.getElementById('nextBtn').style.display = 'block';
             }
         }
 
         function updateDots(id, count) {
-            const dots = document.getElementById(id).children;
-            for(let i=0; i<count; i++) dots[i].classList.add('won');
+            document.getElementById(id).innerHTML = '';
+            for(let i=0; i<2; i++) {
+                const d = document.createElement('div');
+                d.className = 'dot' + (i < count ? ' won' : '');
+                document.getElementById(id).appendChild(d);
+            }
         }
 
         function resetRound() {
@@ -244,33 +296,24 @@
                 c.onclick = () => handleMove(i);
                 document.getElementById('board').appendChild(c);
             }
-            // RANDOM START LOGIC
+            // 50/50 Start Logic
             state.turn = Math.random() > 0.5 ? "X" : "O";
-            document.getElementById('status').innerText = (state.turn === "X" ? state.p1Name : "O") + " STARTS";
+            const starter = state.turn === "X" ? state.p1Name : (state.mode === 'ai' ? "AI" : "P2");
+            document.getElementById('status').innerText = starter + " STARTS FIRST";
             if(state.mode === 'ai' && state.turn === "O") { state.active = false; setTimeout(aiLogic, 600); }
         }
 
         function resetTournament() {
             state.p1Wins = 0; state.p2Wins = 0;
-            document.querySelectorAll('.dot').forEach(d => d.classList.remove('won'));
+            updateDots('p1Dots', 0); updateDots('p2Dots', 0);
             document.getElementById('congrats-overlay').style.display = 'none';
             resetRound();
         }
 
-        function shareScore() {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'NEO MATCH CHALLENGE',
-                    text: `I just dominated Neo Match! Can you beat my streak?`,
-                    url: window.location.href
-                });
-            } else { alert("Sharing not supported on this browser - copy the link!"); }
-        }
-
         function goHome() {
+            stopMusic();
             document.getElementById('game').style.display = 'none';
             document.getElementById('lobby').style.display = 'flex';
-            document.getElementById('congrats-overlay').style.display = 'none';
         }
     </script>
 </body>

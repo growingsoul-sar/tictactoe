@@ -1,4 +1,4 @@
-const CACHE_NAME = 'neo-match-v4'; // Change this number every time you update!
+const CACHE_NAME = 'neo-match-v7';
 const ASSETS = [
     './',
     './index.html',
