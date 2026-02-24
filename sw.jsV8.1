@@ -1,0 +1,32 @@
+const CACHE_NAME = 'sark-ultimate-v8.1'; // Change this number every time you update!
+const ASSETS = [
+  './',
+  './index.html',
+  './manifest.json',
+  'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js'
+];
+
+// 1. Install Phase: Cache files and skip waiting
+self.addEventListener('install', (event) => {
+  self.skipWaiting(); // <--- ADD THIS
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+  );
+});
+
+// 2. Activate Phase: Clean up old caches and take control immediately
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+      );
+    }).then(() => self.clients.claim()) // <--- ADD THIS
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    fetch(event.request).catch(() => caches.match(event.request))
+  );
+});
